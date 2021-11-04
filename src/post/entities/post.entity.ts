@@ -47,7 +47,17 @@ export class Post {
   user: User;
 
   @ManyToMany(() => PostTag, { eager: true })
-  @JoinTable({ name: 'post_to_tags' })
+  @JoinTable({
+    name: 'post_to_tags',
+    joinColumn: {
+      name: 'postId',
+      referencedColumnName: 'id',
+    },
+    inverseJoinColumn: {
+      name: 'postTagName',
+      referencedColumnName: 'name',
+    },
+  })
   tags: PostTag[];
 
   @OneToMany(() => PostTargetGroup, (targetGroup) => targetGroup.post, {
