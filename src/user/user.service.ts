@@ -65,14 +65,11 @@ export class UserService {
     return await this.userToFriendsRepository.save(friendship);
   }
 
-  async update(
-    id: string,
-    updateUserDto: UpdateUserDto,
-  ): Promise<UpdateResult> {
+  async update(id: Uuid, updateUserDto: UpdateUserDto): Promise<UpdateResult> {
     return await this.usersRepository.update(id, updateUserDto);
   }
 
-  async userExists(userId: string): Promise<User> {
+  async userExists(userId: Uuid): Promise<User> {
     return this.usersRepository.findOne({ id: userId });
   }
 }
