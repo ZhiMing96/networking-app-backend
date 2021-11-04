@@ -9,6 +9,10 @@ import { PostTag } from './entities/post-tag.entity';
 import { PostTargetGroup } from './entities/post-target-group.entity';
 import { Post } from './entities/post.entity';
 
+import fp from 'lodash/fp';
+import _ from 'lodash';
+import { PostToTags } from './entities/post-to-tags.entity';
+
 @Injectable()
 export class PostService {
   constructor(
@@ -16,6 +20,8 @@ export class PostService {
     private userService: UserService,
     @InjectRepository(Post) private postRepository: Repository<Post>,
     @InjectRepository(PostTag) private postTagsRepository: Repository<PostTag>,
+    @InjectRepository(PostToTags)
+    private postToTagsRepository: Repository<PostToTags>,
     @InjectRepository(PostTargetGroup)
     private postTargetGroupsRepository: Repository<PostTargetGroup>,
   ) {}
@@ -76,12 +82,40 @@ export class PostService {
   async update(id: Uuid, updatePostDto: UpdatePostDto) {
     const post = await this.postRepository.findOne({ id });
     if (!post) throw new NotFoundException('Post not found');
-    return await this.postRepository.update(id, {
-      content: updatePostDto.content,
-      imageUrl: updatePostDto.imageUrl,
-      userId: updatePostDto.userId,
-      visibility: updatePostDto.visibility,
-    });
+    await this.postToTagsRepository.delete({ postId: post.id });
+    const tagNames = updatePostDto.tags.map((name) =>
+      this.postTagsRepository.create({ name }),
+    );
+    await this.postTagsRepository.save(tagNames);
+
+    const existingTargetGroupIds = post.targetGroups.map(({ id }) => id);
+    const updatedTargetGroupIds = updatePostDto.targetGroups
+      .map(({ id }) => id)
+      .filter((id) => !_.isNil(id));
+    const targetGroupsIdsToRemove = _.differenceBy(
+      existingTargetGroupIds,
+      updatedTargetGroupIds,
+      'id',
+    );
+    await this.postTargetGroupsRepository.delete(targetGroupsIdsToRemove);
+    const newTargetGroups = updatePostDto.targetGroups.map((group) =>
+      this.postTargetGroupsRepository.create({
+        ...group,
+        occupationName: group.occupationName.toLowerCase(),
+        industryName: group.industryName.toLowerCase(),
+        postId: post.id,
+      }),
+    );
+    const savedTargetGroups = await this.postTargetGroupsRepository.save(
+      newTargetGroups,
+    );
+
+    post.content = updatePostDto.content;
+    post.imageUrl = updatePostDto.imageUrl;
+    post.visibility = updatePostDto.visibility;
+    post.tags = tagNames;
+    post.targetGroups = savedTargetGroups;
+    return await this.postRepository.save(post);
   }
 
   async remove(id: Uuid) {

@@ -9,6 +9,7 @@ import { User } from 'src/user/entities/user.entity';
 import { Post } from './entities/post.entity';
 import { UserModule } from 'src/user/user.module';
 import { Industry } from './entities/industry.entity';
+import { PostToTags } from './entities/post-to-tags.entity';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { Industry } from './entities/industry.entity';
       Occupation,
       PostTargetGroup,
       Industry,
+      PostToTags,
     ]),
     UserModule,
   ],
