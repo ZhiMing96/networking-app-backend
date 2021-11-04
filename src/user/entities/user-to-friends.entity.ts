@@ -1,13 +1,14 @@
+import { Uuid } from 'src/utils/types';
 import { Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
 import { User } from './user.entity';
 
 @Entity()
 export class UserToFriends {
   @PrimaryColumn()
-  initiatorId: string;
+  initiatorId: Uuid;
 
   @PrimaryColumn()
-  acceptorId: string;
+  acceptorId: Uuid;
 
   @ManyToOne(() => User, (user) => user.friendsAdded, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'initiatorId' })

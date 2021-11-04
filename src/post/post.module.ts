@@ -8,6 +8,7 @@ import { PostTargetGroup } from './entities/post-target-group.entity';
 import { User } from 'src/user/entities/user.entity';
 import { Post } from './entities/post.entity';
 import { UserModule } from 'src/user/user.module';
+import { Industry } from './entities/industry.entity';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { UserModule } from 'src/user/user.module';
       PostTag,
       Occupation,
       PostTargetGroup,
+      Industry,
     ]),
     UserModule,
   ],

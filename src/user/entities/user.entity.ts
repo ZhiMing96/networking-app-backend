@@ -11,11 +11,12 @@ import { FriendRequest } from '../../friend-request/entities/friend-request.enti
 
 import { UserToFriends } from './user-to-friends.entity';
 import { Post } from 'src/post/entities/post.entity';
+import { Uuid } from 'src/utils/types';
 
 @Entity()
 export class User {
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  id: Uuid;
 
   @Column('varchar', { length: 255 })
   firstName: string;

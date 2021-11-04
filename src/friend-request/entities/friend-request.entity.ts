@@ -1,3 +1,4 @@
+import { Uuid } from 'src/utils/types';
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
 import { User } from '../../user/entities/user.entity';
 
@@ -10,10 +11,10 @@ export enum RequestStatus {
 @Entity()
 export class FriendRequest {
   @PrimaryColumn('uuid')
-  fromUserId: string;
+  fromUserId: Uuid;
 
   @PrimaryColumn('uuid')
-  toUserId: string;
+  toUserId: Uuid;
 
   @Column({ default: RequestStatus.PENDING })
   status: RequestStatus;

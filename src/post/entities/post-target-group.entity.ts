@@ -1,4 +1,12 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Uuid } from 'src/utils/types';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { Industry } from './industry.entity';
 import { Occupation } from './occupation.entity';
 import { Post } from './post.entity';
 
@@ -23,10 +31,10 @@ export enum YearsOfExp {
 @Entity()
 export class PostTargetGroup {
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  id: Uuid;
 
   @Column()
-  title: string;
+  jobTitle: string;
 
   @Column()
   yearsOfExp: YearsOfExp;
@@ -34,9 +42,24 @@ export class PostTargetGroup {
   @Column()
   seniority: SeniorityType;
 
+  @Column({ nullable: false })
+  postId: Uuid;
+
+  @Column()
+  occupationName: string;
+
+  @Column()
+  industryName: string;
+
   @ManyToOne(() => Post, (post) => post.targetGroups)
+  @JoinColumn({ name: 'postId' })
   post: Post;
 
   @ManyToOne(() => Occupation)
+  @JoinColumn({ name: 'occupationName' })
   occupation: Occupation;
+
+  @ManyToOne(() => Industry)
+  @JoinColumn({ name: 'industryName' })
+  industry: Industry;
 }

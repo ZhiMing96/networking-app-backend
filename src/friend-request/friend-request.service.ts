@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserToFriends } from 'src/user/entities/user-to-friends.entity';
-import { User } from 'src/user/entities/user.entity';
+import { Uuid } from 'src/utils/types';
 import { Connection, Repository } from 'typeorm';
 import { CreateFriendRequestDto } from './dto/create-friend-request.dto';
 import { FriendRequest, RequestStatus } from './entities/friend-request.entity';
@@ -37,8 +37,8 @@ export class FriendRequestService {
   }
 
   async rejectFriendRequest(
-    fromUserId: string,
-    toUserId: string,
+    fromUserId: Uuid,
+    toUserId: Uuid,
   ): Promise<FriendRequest> {
     const friendRequest = await this.friendRequestRepository.findOne({
       fromUserId,
@@ -46,7 +46,7 @@ export class FriendRequestService {
     });
     if (!friendRequest) throw new NotFoundException();
     const queryRunner = this.connection.createQueryRunner();
-    queryRunner.connect();
+    await queryRunner.connect();
     await queryRunner.startTransaction();
     try {
       friendRequest.status = RequestStatus.REJECTED;
@@ -66,8 +66,8 @@ export class FriendRequestService {
   }
 
   async acceptFriendRequest(
-    fromUserId: string,
-    toUserId: string,
+    fromUserId: Uuid,
+    toUserId: Uuid,
   ): Promise<UserToFriends> {
     const friendRequest = await this.friendRequestRepository.findOne({
       fromUserId,

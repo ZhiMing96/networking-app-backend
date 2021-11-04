@@ -1,4 +1,5 @@
 import { User } from 'src/user/entities/user.entity';
+import { Uuid } from 'src/utils/types';
 import {
   Column,
   Entity,
@@ -21,7 +22,7 @@ export enum VisibilityTypes {
 @Entity()
 export class Post {
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  id: Uuid;
 
   @Column({ nullable: false })
   content: string;
@@ -30,7 +31,7 @@ export class Post {
   imageUrl: string;
 
   @Column('uuid')
-  userId: string;
+  userId: Uuid;
 
   @Column({ default: VisibilityTypes.PUBLIC })
   visibility: VisibilityTypes;
@@ -45,10 +46,12 @@ export class Post {
   @JoinColumn({ name: 'userId' })
   user: User;
 
-  @ManyToMany(() => PostTag, { onDelete: 'SET NULL' })
-  @JoinTable({ name: 'post_tags' })
+  @ManyToMany(() => PostTag, { eager: true })
+  @JoinTable({ name: 'post_to_tags' })
   tags: PostTag[];
 
-  @OneToMany(() => PostTargetGroup, (targetGroup) => targetGroup.post)
+  @OneToMany(() => PostTargetGroup, (targetGroup) => targetGroup.post, {
+    eager: true,
+  })
   targetGroups: PostTargetGroup[];
 }

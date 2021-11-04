@@ -6,6 +6,7 @@ import { Connection, Repository, UpdateResult } from 'typeorm';
 import { User } from './entities/user.entity';
 import { UserToFriends } from './entities/user-to-friends.entity';
 import { throwIfEmpty } from 'rxjs';
+import { Uuid } from 'src/utils/types';
 
 @Injectable()
 export class UserService {
@@ -25,11 +26,11 @@ export class UserService {
     return await this.usersRepository.find();
   }
 
-  async findOne(id: string): Promise<User> {
+  async findOne(id: Uuid): Promise<User> {
     return await this.usersRepository.findOne(id);
   }
 
-  async findOneWithFriends(id: string): Promise<User[]> {
+  async findOneWithFriends(id: Uuid): Promise<User[]> {
     const friendsAccepted = await this.connection
       .createQueryBuilder()
       .from(UserToFriends, 'utf')
@@ -47,7 +48,7 @@ export class UserService {
     return friendsAccepted.concat(friendsInitiated);
   }
 
-  async createFriendRelationship(initiator_id: string, acceptor_id: string) {
+  async createFriendRelationship(initiator_id: Uuid, acceptor_id: Uuid) {
     const initiator = await this.usersRepository.findOneOrFail({
       id: initiator_id,
     });

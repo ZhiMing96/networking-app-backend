@@ -12,6 +12,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UpdateResult } from 'typeorm';
 import { User } from './entities/user.entity';
+import { Uuid } from 'src/utils/types';
 
 @Controller('user')
 export class UserController {
@@ -28,7 +29,7 @@ export class UserController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string): Promise<User> {
+  findOne(@Param('id') id: Uuid): Promise<User> {
     return this.userService.findOne(id);
   }
 
@@ -41,13 +42,13 @@ export class UserController {
   }
 
   @Get('/friends/:id')
-  findOneWithFriends(@Param('id') id: string): Promise<User[]> {
+  findOneWithFriends(@Param('id') id: Uuid): Promise<User[]> {
     return this.userService.findOneWithFriends(id);
   }
 
   @Patch(':id')
   update(
-    @Param('id') id: string,
+    @Param('id') id: Uuid,
     @Body() updateUserDto: UpdateUserDto,
   ): Promise<UpdateResult> {
     return this.userService.update(id, updateUserDto);
