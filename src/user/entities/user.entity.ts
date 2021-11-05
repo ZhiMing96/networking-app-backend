@@ -18,29 +18,38 @@ export class User {
   @PrimaryGeneratedColumn('uuid')
   id: Uuid;
 
-  @Column('varchar', { length: 255 })
+  @Column('varchar', { length: 255, nullable: true })
   firstName: string;
 
-  @Column('varchar', { length: 255 })
+  @Column('varchar', { length: 255, nullable: true })
   lastName: string;
 
-  @Column('varchar', { length: 255 })
+  @Column('varchar', { length: 255, unique: true })
   emailAddress: string;
 
-  @Column()
+  @Column({ nullable: true })
   profileImageUrl: string;
 
-  @Column('varchar', { length: 50 })
+  @Column('varchar', { length: 50, nullable: true })
   shortDescription: string;
 
-  @Column()
+  @Column({ nullable: true })
   longDescription: string;
 
-  @Column('timestamptz', { default: new Date() })
-  created_at: Date;
+  @Column({ unique: true })
+  username: string;
+
+  @Column({ select: false, unique: true })
+  passwordHash: string;
+
+  @Column({ nullable: true })
+  phoneNumber: string;
 
   @Column('timestamptz', { default: new Date() })
-  updated_at: Date;
+  createdAt: string;
+
+  @Column('timestamptz', { default: new Date() })
+  updatedAt: string;
 
   @ManyToOne(() => Country)
   @JoinColumn()

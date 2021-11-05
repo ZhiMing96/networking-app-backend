@@ -7,6 +7,7 @@ import { UserModule } from './user/user.module';
 import { FriendRequestModule } from './friend-request/friend-request.module';
 import { PostModule } from './post/post.module';
 import { IntroductionModule } from './introduction/introduction.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { IntroductionModule } from './introduction/introduction.module';
     FriendRequestModule,
     PostModule,
     IntroductionModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],
