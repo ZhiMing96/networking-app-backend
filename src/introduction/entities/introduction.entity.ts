@@ -39,10 +39,10 @@ export class Introduction {
   postId: Uuid;
 
   @Column('timestamptz', { default: new Date() })
-  created_at: Date;
+  createdAt: string;
 
   @Column('timestamptz', { default: new Date() })
-  updated_at: Date;
+  updatedAt: string;
 
   @ManyToOne(() => User)
   @JoinColumn({ name: 'introducedByUserId' })

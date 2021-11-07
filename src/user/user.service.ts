@@ -1,12 +1,12 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Connection, Repository, UpdateResult } from 'typeorm';
 import { User } from './entities/user.entity';
 import { UserToFriends } from './entities/user-to-friends.entity';
-import { throwIfEmpty } from 'rxjs';
 import { Uuid } from 'src/utils/types';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UserService {
@@ -18,7 +18,13 @@ export class UserService {
   ) {}
 
   async create(createUserDto: CreateUserDto): Promise<User> {
-    const newUser = this.usersRepository.create(createUserDto);
+    const { password, ...rest } = createUserDto;
+    const passwordHash = await bcrypt.hash(
+      password,
+      parseInt(process.env.SALT_ROUNDS),
+    );
+
+    const newUser = this.usersRepository.create({ ...rest, passwordHash });
     return await this.usersRepository.save(newUser);
   }
 
@@ -28,6 +34,14 @@ export class UserService {
 
   async findOne(id: Uuid): Promise<User> {
     return await this.usersRepository.findOne(id);
+  }
+
+  async findOneForLogin(username: Uuid): Promise<User> {
+    return await this.usersRepository
+      .createQueryBuilder('user')
+      .addSelect('user.passwordHash')
+      .where('user.username = :username', { username })
+      .getOne();
   }
 
   async findOneWithFriends(id: Uuid): Promise<User[]> {

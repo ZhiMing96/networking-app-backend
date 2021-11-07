@@ -23,10 +23,10 @@ export class FriendRequest {
   comment: string;
 
   @Column('timestamptz', { default: new Date() })
-  created_at: Date;
+  createdAt: string;
 
   @Column('timestamptz', { default: new Date() })
-  updated_at: Date;
+  updatedAt: string;
 
   @ManyToOne(() => User, (user) => user.friendRequestsGiven)
   @JoinColumn({ name: 'fromUserId' })
