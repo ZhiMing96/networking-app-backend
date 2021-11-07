@@ -21,7 +21,6 @@ export class UserController {
 
   @Get()
   findAll(@Req() req): Promise<User[]> {
-    console.log(req.user);
     return this.userService.findAll();
   }
 
