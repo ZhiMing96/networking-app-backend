@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  app:
+    container_name: app
+    restart: always
+    build:
+      context: ../../
+      target: development
+    volumes:
+      - ../../:/usr/src/app
+      - exclude:/usr/src/app/node_modules
+    ports:
+      - 3000:3000
+    env_file:
+      - .env
+    links:
+      - pg_db
+
+  pg_db:
+    container_name: pg_db
+    image: postgres:14.0-alpine3.14
+    env_file:
+      - .env
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+
+  caddy:
+    image: caddy/caddy:2.4.5-alpine
+    container_name: caddy
+    depends_on:
+      - 'app'
+    restart: always
+    ports:
+      - '443:443'
+      - '80:80'
+    volumes:
+      - $PWD/Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+
+volumes:
+  pgdata:
+  caddy_data:
+  caddy_config:
+  exclude:
