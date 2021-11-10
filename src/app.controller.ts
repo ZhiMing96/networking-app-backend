@@ -21,11 +21,13 @@ export class AppController {
     private userService: UserService,
   ) {}
 
+  @Public()
   @Get()
   getHello(): string {
     return this.appService.getHello();
   }
 
+  @Public()
   @Post('app/login')
   async login(@Body() loginDto: LoginDto) {
     return this.authService.login(loginDto);

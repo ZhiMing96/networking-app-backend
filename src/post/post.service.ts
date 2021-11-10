@@ -33,9 +33,9 @@ export class PostService {
     await queryRunner.startTransaction();
     try {
       const postTagNames = createPostDto.tags;
-      const processedTagNames = postTagNames.map((name) =>
-        this.postTagsRepository.create({ name }),
-      );
+      const processedTagNames = postTagNames
+        ? postTagNames.map((name) => this.postTagsRepository.create({ name }))
+        : [];
       const savedTags = await queryRunner.manager.save(processedTagNames);
 
       const newPost = this.postRepository.create({
@@ -47,14 +47,16 @@ export class PostService {
       });
       let savedPost = await queryRunner.manager.save(newPost);
 
-      const newTargetGroups = createPostDto.targetGroups.map((group) =>
-        this.postTargetGroupsRepository.create({
-          ...group,
-          occupationName: group.occupationName.toLowerCase(),
-          industryName: group.industryName.toLowerCase(),
-          postId: savedPost.id,
-        }),
-      );
+      const newTargetGroups = createPostDto.targetGroups
+        ? createPostDto.targetGroups.map((group) =>
+            this.postTargetGroupsRepository.create({
+              ...group,
+              occupationName: group.occupationName.toLowerCase(),
+              industryName: group.industryName.toLowerCase(),
+              postId: savedPost.id,
+            }),
+          )
+        : [];
       const savedTargetGroups = await queryRunner.manager.save(newTargetGroups);
       savedPost.targetGroups = savedTargetGroups;
       savedPost = await queryRunner.manager.save(savedPost);

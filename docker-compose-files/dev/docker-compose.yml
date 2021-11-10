@@ -19,6 +19,7 @@ services:
 
   pg_db:
     container_name: pg_db
+    restart: always
     image: postgres:14.0-alpine3.14
     env_file:
       - .env
