@@ -4,6 +4,7 @@ import { UserInterface } from 'src/user/interfaces/user-interface.interface';
 import { UserService } from 'src/user/user.service';
 import * as bcrypt from 'bcrypt';
 import { LoginDto } from './dto/login.dto';
+import { JwtPayload } from './interfaces/jwt-payload.interface';
 
 @Injectable()
 export class AuthService {
@@ -24,20 +25,47 @@ export class AuthService {
   async login(loginDto: LoginDto) {
     const { username, password } = loginDto;
     const user = await this.validateUser(username, password);
-    return this.generateJwt(user);
+    return this.generateJwt({
+      id: user.id,
+      emailAddress: user.emailAddress,
+      username: user.username,
+    });
   }
 
-  generateJwt(user: UserInterface) {
+  generateJwt({ username, id, emailAddress }: JwtPayload) {
     const jwtPayload = {
       user: {
-        username: user.username,
-        id: user.id,
-        email: user.emailAddress,
+        username,
+        id,
+        emailAddress,
       },
     };
     return {
       access_token: this.jwtService.sign(jwtPayload),
-      ...user,
+      username,
+      id,
+      emailAddress,
     };
+  }
+
+  async validateOrCreateJwt(token: string) {
+    try {
+      return await this.validateJwt(token);
+    } catch (e: any) {
+      if (e.name !== 'TokenExpiredError') {
+        throw e;
+      }
+      const tokenPayload = this.jwtService.decode(token) as {
+        user: JwtPayload;
+      };
+      const jwtPayload = tokenPayload.user as JwtPayload;
+      console.log(
+        `jwt token expired, issuing a new one for user ${jwtPayload.username}..`,
+      );
+      return this.generateJwt(jwtPayload);
+    }
+  }
+  async validateJwt(token: string) {
+    return await this.jwtService.verifyAsync(token);
   }
 }
