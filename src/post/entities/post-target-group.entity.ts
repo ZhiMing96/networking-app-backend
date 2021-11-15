@@ -6,8 +6,8 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { Industry } from './industry.entity';
-import { Occupation } from './occupation.entity';
+import { Industry } from '../../shared/entities/industry.entity';
+import { Occupation } from '../../shared/entities/occupation.entity';
 import { Post } from './post.entity';
 
 export enum SeniorityType {

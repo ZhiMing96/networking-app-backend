@@ -9,9 +9,9 @@ import { PostTag } from './entities/post-tag.entity';
 import { PostTargetGroup } from './entities/post-target-group.entity';
 import { Post } from './entities/post.entity';
 
-import fp from 'lodash/fp';
 import _ from 'lodash';
 import { PostToTags } from './entities/post-to-tags.entity';
+import { PostTargetExpertise } from './entities/post-target-expertise.entity';
 
 @Injectable()
 export class PostService {
@@ -24,6 +24,8 @@ export class PostService {
     private postToTagsRepository: Repository<PostToTags>,
     @InjectRepository(PostTargetGroup)
     private postTargetGroupsRepository: Repository<PostTargetGroup>,
+    @InjectRepository(PostTargetExpertise)
+    private postTargetExpertiseRepository: Repository<PostTargetExpertise>,
   ) {}
   async create(createPostDto: CreatePostDto): Promise<Post> {
     const user = await this.userService.userExists(createPostDto.userId);
@@ -58,7 +60,20 @@ export class PostService {
           )
         : [];
       const savedTargetGroups = await queryRunner.manager.save(newTargetGroups);
+      const newTargetExpertise = createPostDto.targetExpertise
+        ? createPostDto.targetExpertise.map((group) =>
+            this.postTargetExpertiseRepository.create({
+              ...group,
+              expertiseName: group.expertiseName.toLowerCase(),
+              postId: savedPost.id,
+            }),
+          )
+        : [];
+      const savedTargetExpertise = await queryRunner.manager.save(
+        newTargetExpertise,
+      );
       savedPost.targetGroups = savedTargetGroups;
+      savedPost.targetExpertise = savedTargetExpertise;
       savedPost = await queryRunner.manager.save(savedPost);
       await queryRunner.commitTransaction();
       return savedPost;
@@ -111,12 +126,25 @@ export class PostService {
     const savedTargetGroups = await this.postTargetGroupsRepository.save(
       newTargetGroups,
     );
+    const newTargetExpertise = updatePostDto.targetExpertise
+      ? updatePostDto.targetExpertise.map((group) =>
+          this.postTargetExpertiseRepository.create({
+            ...group,
+            expertiseName: group.expertiseName.toLowerCase(),
+            postId: post.id,
+          }),
+        )
+      : [];
+    const savedTargetExpertise = await this.postTargetExpertiseRepository.save(
+      newTargetExpertise,
+    );
 
     post.content = updatePostDto.content;
     post.imageUrl = updatePostDto.imageUrl;
     post.visibility = updatePostDto.visibility;
     post.tags = tagNames;
     post.targetGroups = savedTargetGroups;
+    post.targetExpertise = savedTargetExpertise;
     return await this.postRepository.save(post);
   }
 

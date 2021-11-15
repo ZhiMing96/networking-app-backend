@@ -6,12 +6,13 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { Country } from './country.entities';
+import { Country } from '../../shared/entities/country.entities';
 import { FriendRequest } from '../../friend-request/entities/friend-request.entity';
 
 import { UserToFriends } from './user-to-friends.entity';
 import { Post } from 'src/post/entities/post.entity';
 import { Uuid } from 'src/utils/types';
+import { UserExpertise } from './user-expertise.entity';
 
 @Entity()
 export class User {
@@ -69,4 +70,7 @@ export class User {
 
   @OneToMany(() => Post, (post) => post.user)
   posts: Post[];
+
+  @OneToMany(() => UserExpertise, (expertise) => expertise.user)
+  expertise: UserExpertise[];
 }

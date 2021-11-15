@@ -1,5 +1,5 @@
 import { PartialType } from '@nestjs/mapped-types';
-import { Country } from '../entities/country.entities';
+import { Country } from '../../shared/entities/country.entities';
 import { CreateUserDto } from './create-user.dto';
 
 export class UpdateUserDto extends PartialType(CreateUserDto) {

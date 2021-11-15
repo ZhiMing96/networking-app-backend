@@ -8,6 +8,7 @@ import { FriendRequestModule } from './friend-request/friend-request.module';
 import { PostModule } from './post/post.module';
 import { IntroductionModule } from './introduction/introduction.module';
 import { AuthModule } from './auth/auth.module';
+import { SharedModule } from './shared/shared.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { AuthModule } from './auth/auth.module';
     PostModule,
     IntroductionModule,
     AuthModule,
+    SharedModule,
   ],
   controllers: [AppController],
   providers: [AppService],

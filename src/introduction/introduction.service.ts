@@ -1,5 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { PostService } from 'src/post/post.service';
+import { User } from 'src/user/entities/user.entity';
 import { UserService } from 'src/user/user.service';
 import { Uuid } from 'src/utils/types';
 import { Repository } from 'typeorm';
@@ -12,6 +14,7 @@ import { introductionsForUser } from './interfaces/introductionsForUser.interfac
 export class IntroductionService {
   constructor(
     private userService: UserService,
+    private postService: PostService,
     @InjectRepository(Introduction)
     private introductionRepository: Repository<Introduction>,
   ) {}
@@ -43,6 +46,26 @@ export class IntroductionService {
       ({ fromUserId }) => fromUserId === userId,
     );
     return { given, receivedAsFrom, receivedAsTo };
+  }
+
+  async getSuggestions(postId: Uuid, currUserId: Uuid): Promise<User[]> {
+    const post = await this.postService.findOne(postId);
+    const userFriends = await this.userService.findOneWithFriends(currUserId);
+    if (!post) throw new NotFoundException('Post not found');
+    if (!post.targetExpertise) return [];
+    const { targetExpertise } = post;
+    const postExpertiseSet = new Set(
+      targetExpertise.map(({ expertiseName }) => expertiseName),
+    );
+    const friendsWithExpertiseMatch = userFriends.filter(({ expertise }) => {
+      const match = expertise.find(({ expertiseName }) =>
+        postExpertiseSet.has(expertiseName),
+      );
+      if (!match) return false;
+      return true;
+    });
+
+    return friendsWithExpertiseMatch;
   }
 
   async findOne(id: Uuid): Promise<Introduction> {

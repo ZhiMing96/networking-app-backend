@@ -11,6 +11,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { PostTag } from './post-tag.entity';
+import { PostTargetExpertise } from './post-target-expertise.entity';
 import { PostTargetGroup } from './post-target-group.entity';
 
 export enum VisibilityTypes {
@@ -64,4 +65,13 @@ export class Post {
     eager: true,
   })
   targetGroups: PostTargetGroup[];
+
+  @OneToMany(
+    () => PostTargetExpertise,
+    (targetExpertise) => targetExpertise.post,
+    {
+      eager: true,
+    },
+  )
+  targetExpertise: PostTargetExpertise[];
 }

@@ -1,4 +1,4 @@
-import { Country } from '../entities/country.entities';
+import { Country } from '../../shared/entities/country.entities';
 
 export interface UserInterface {
   id: string;
